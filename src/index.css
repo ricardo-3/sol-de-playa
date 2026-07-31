@@ -1,0 +1,71 @@
+@import "tailwindcss";
+
+@layer utilities {
+  .glass-clear {
+    background: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 28px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  }
+
+  .glass-clear-sm {
+    background: rgba(255, 255, 255, 0.14);
+    backdrop-filter: blur(16px) saturate(180%);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.20);
+    border-radius: 20px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.10);
+  }
+
+  .app-background {
+    position: fixed;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    z-index: -1;
+    transition: opacity 1.2s ease-in-out, filter 1.2s ease-in-out;
+  }
+
+  .temp-hero {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', sans-serif;
+    font-weight: 200;
+    font-size: clamp(80px, 20vw, 140px);
+    color: white;
+    letter-spacing: -0.03em;
+    line-height: 0.9;
+    text-shadow: 0 4px 24px rgba(0, 0, 0, 0.25);
+  }
+
+  .label-secondary {
+    font-weight: 400;
+    color: rgba(255, 255, 255, 0.65);
+    font-size: 15px;
+  }
+
+  .section-title {
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.92);
+    font-size: 15px;
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
+  }
+}
+
+/* Custom smooth scrollbar for horizontal forecast timelines */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', 'Inter', sans-serif;
+  color: white;
+  background-color: #0b1d33;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}

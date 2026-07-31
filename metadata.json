@@ -1,0 +1,6 @@
+{
+  "name": "Sol de Playa",
+  "description": "Reporte de playa en tiempo real con estética Apple Weather — Mareas, oleaje, índice UV, salida/puesta de sol y clima.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
