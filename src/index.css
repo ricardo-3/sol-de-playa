@@ -19,6 +19,17 @@
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.10);
   }
 
+  /* Higher-opacity glass reserved for floating menus (dropdowns) so the
+     content sitting underneath never bleeds through and becomes unreadable. */
+  .glass-menu {
+    background: rgba(12, 24, 38, 0.82);
+    backdrop-filter: blur(24px) saturate(160%);
+    -webkit-backdrop-filter: blur(24px) saturate(160%);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 20px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+  }
+
   .app-background {
     position: fixed;
     inset: 0;
@@ -26,6 +37,14 @@
     background-position: center;
     z-index: -1;
     transition: opacity 1.2s ease-in-out, filter 1.2s ease-in-out;
+    /* Force GPU layer promotion — prevents the hairline seam that iOS
+       Safari sometimes renders on fixed full-viewport layers during
+       fast momentum scroll. */
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    will-change: opacity;
   }
 
   .temp-hero {

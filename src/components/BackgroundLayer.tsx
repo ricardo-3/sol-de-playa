@@ -62,7 +62,7 @@ export const BackgroundLayer: React.FC<BackgroundLayerProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 overflow-hidden pointer-events-none -z-10 bg-slate-900">
+    <div className="fixed inset-0 overflow-hidden pointer-events-none -z-10 bg-slate-900 transform-gpu">
       {/* Fallback Gradient */}
       <div
         className="absolute inset-0 transition-opacity duration-1000"
@@ -83,8 +83,13 @@ export const BackgroundLayer: React.FC<BackgroundLayerProps> = ({
         />
       )}
 
-      {/* Vignette / Dark Contrast Mask for Text Legibility */}
-      <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/60 backdrop-brightness-[0.92]" />
+      {/* Vignette / Dark Contrast Mask for Text Legibility.
+          Plain gradient only — no backdrop-filter here. Stacking a
+          backdrop-filter on top of another fixed, full-viewport layer is a
+          known WebKit (iOS Safari) bug that causes a hairline seam/tear to
+          flash in during fast scroll. The gradient's own alpha already
+          darkens the photo underneath, so the filter was redundant. */}
+      <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-black/60" />
     </div>
   );
 };

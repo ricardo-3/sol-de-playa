@@ -22,18 +22,13 @@ export const CustomDropdown: React.FC<CustomDropdownProps> = ({
   onToggleTempUnit,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [isTimeMenuOpen, setIsTimeMenuOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const timeMenuRef = useRef<HTMLDivElement>(null);
 
   // Close when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsOpen(false);
-      }
-      if (timeMenuRef.current && !timeMenuRef.current.contains(event.target as Node)) {
-        setIsTimeMenuOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -42,14 +37,33 @@ export const CustomDropdown: React.FC<CustomDropdownProps> = ({
 
   const timeSlotLabels: Record<TimeOfDay | 'auto', { label: string; icon: React.ReactNode }> = {
     auto: { label: 'Hora Real', icon: <Sparkles className="w-4 h-4 text-amber-300" /> },
-    morning: { label: 'Mañana (09h)', icon: <Sunrise className="w-4 h-4 text-amber-300" /> },
-    afternoon: { label: 'Tarde (14h)', icon: <Sun className="w-4 h-4 text-yellow-300" /> },
-    golden: { label: 'Golden Hour (18h)', icon: <Sunset className="w-4 h-4 text-orange-400" /> },
-    night: { label: 'Noche (22h)', icon: <Moon className="w-4 h-4 text-indigo-300" /> },
+    morning: { label: 'Mañana', icon: <Sunrise className="w-4 h-4 text-amber-300" /> },
+    afternoon: { label: 'Tarde', icon: <Sun className="w-4 h-4 text-yellow-300" /> },
+    golden: { label: 'Golden Hour', icon: <Sunset className="w-4 h-4 text-orange-400" /> },
+    night: { label: 'Noche', icon: <Moon className="w-4 h-4 text-indigo-300" /> },
+  };
+
+  // Simple click-to-cycle order: no dropdown, no overlay — just advances
+  // to the next atmosphere and swaps the icon. Removes the whole class of
+  // "menu overlaps content" bug for this control.
+  const timeCycleOrder: (TimeOfDay | 'auto')[] = ['auto', 'morning', 'afternoon', 'golden', 'night'];
+  const cycleTime = () => {
+    const currentIndex = timeCycleOrder.indexOf(overrideTime);
+    const nextIndex = (currentIndex + 1) % timeCycleOrder.length;
+    onSelectOverrideTime(timeCycleOrder[nextIndex]);
   };
 
   return (
     <header className="sticky top-0 z-50 w-full pt-4 pb-2 px-4 sm:px-6 max-w-5xl mx-auto flex items-center justify-between gap-3">
+      {/* Dark scrim behind the beach dropdown — keeps content underneath from
+          bleeding through and visually separates the menu from the page. */}
+      {isOpen && (
+        <div
+          className="fixed inset-0 bg-black/30 z-40"
+          onClick={() => setIsOpen(false)}
+        />
+      )}
+
       {/* Custom Beach Selector Dropdown */}
       <div className="relative" ref={dropdownRef}>
         <button
@@ -79,7 +93,7 @@ export const CustomDropdown: React.FC<CustomDropdownProps> = ({
         {isOpen && (
           <div
             id="beach-dropdown"
-            className="absolute top-full mt-2 left-0 sm:left-auto w-72 glass-clear rounded-2xl overflow-hidden z-50 py-1.5 shadow-2xl border border-white/25 animate-in fade-in slide-in-from-top-2 duration-200"
+            className="absolute top-full mt-2 left-0 sm:left-auto w-72 glass-menu rounded-2xl overflow-hidden z-50 py-1.5 shadow-2xl border border-white/25 animate-in fade-in slide-in-from-top-2 duration-200"
           >
             <div className="px-3.5 py-2 border-b border-white/10 flex items-center justify-between">
               <span className="text-xs font-semibold uppercase tracking-wider text-white/60">
@@ -128,47 +142,22 @@ export const CustomDropdown: React.FC<CustomDropdownProps> = ({
         )}
       </div>
 
-      {/* Right Controls: Time Slot Simulator + Temperature Unit Toggle */}
+      {/* Right Controls: Time-of-Day Cycle Button + Temperature Unit Toggle */}
       <div className="flex items-center gap-2">
-        {/* Time of Day Override Selector */}
-        <div className="relative" ref={timeMenuRef}>
-          <button
-            onClick={() => setIsTimeMenuOpen(!isTimeMenuOpen)}
-            className="glass-clear px-3 py-2 rounded-full flex items-center gap-1.5 text-xs text-white/90 hover:bg-white/20 transition cursor-pointer"
-            title="Cambiar atmósfera horaria"
-          >
+        {/* Time of Day — single click-to-cycle button, no dropdown/overlay */}
+        <button
+          onClick={cycleTime}
+          className="glass-clear px-3 py-2 rounded-full flex items-center gap-1.5 text-xs text-white/90 hover:bg-white/20 active:scale-90 transition-all duration-200 cursor-pointer"
+          title="Tocá para cambiar la atmósfera horaria"
+          aria-label={`Atmósfera actual: ${timeSlotLabels[overrideTime].label}. Tocá para cambiar.`}
+        >
+          <span className="transition-transform duration-300">
             {timeSlotLabels[overrideTime].icon}
-            <span className="hidden sm:inline text-xs font-medium">
-              {timeSlotLabels[overrideTime].label}
-            </span>
-          </button>
-
-          {isTimeMenuOpen && (
-            <div className="absolute top-full mt-2 right-0 w-52 glass-clear rounded-2xl overflow-hidden z-50 py-1.5 shadow-2xl border border-white/20">
-              <div className="px-3 py-1.5 border-b border-white/10 text-[11px] font-medium text-white/60">
-                Fondo Fotográfico Real
-              </div>
-              {(['auto', 'morning', 'afternoon', 'golden', 'night'] as const).map((slot) => (
-                <button
-                  key={slot}
-                  onClick={() => {
-                    onSelectOverrideTime(slot);
-                    setIsTimeMenuOpen(false);
-                  }}
-                  className={`w-full text-left px-3.5 py-2 text-xs flex items-center justify-between hover:bg-white/10 transition ${
-                    overrideTime === slot ? 'bg-white/20 text-white font-medium' : 'text-white/80'
-                  }`}
-                >
-                  <div className="flex items-center gap-2">
-                    {timeSlotLabels[slot].icon}
-                    <span>{timeSlotLabels[slot].label}</span>
-                  </div>
-                  {overrideTime === slot && <Check className="w-3.5 h-3.5 text-white" />}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
+          </span>
+          <span className="hidden sm:inline text-xs font-medium">
+            {timeSlotLabels[overrideTime].label}
+          </span>
+        </button>
 
         {/* Temp Unit Toggle */}
         <button
